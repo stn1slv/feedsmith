@@ -12,3 +12,10 @@ feeds:
     url: "https://konghq.com/blog/page/1"
     site_url: "https://konghq.com/blog/"
     max_items: 20
+
+  bump:
+    title: "Bump.sh Blog"
+    extractor: bump_blog
+    url: "https://bump.sh/blog/"
+    site_url: "https://bump.sh/blog/"
+    max_items: 20

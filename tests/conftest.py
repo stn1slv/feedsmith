@@ -33,6 +33,11 @@ def kong_html() -> str:
 
 
 @pytest.fixture
+def bump_html() -> str:
+    return (FIXTURES / "bump_blog.html").read_text(encoding="utf-8")
+
+
+@pytest.fixture
 def boomi_config() -> FeedConfig:
     return FeedConfig(
         id="boomi",
@@ -52,6 +57,18 @@ def kong_config() -> FeedConfig:
         extractor="nextjs_blog",
         url="https://konghq.com/blog/page/1",
         site_url="https://konghq.com/blog/",
+        max_items=20,
+    )
+
+
+@pytest.fixture
+def bump_config() -> FeedConfig:
+    return FeedConfig(
+        id="bump",
+        title="Bump.sh Blog",
+        extractor="bump_blog",
+        url="https://bump.sh/blog/",
+        site_url="https://bump.sh/blog/",
         max_items=20,
     )
 
