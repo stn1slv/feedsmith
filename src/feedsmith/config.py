@@ -1,4 +1,4 @@
-"""Configuration loading for LocalFeed.
+"""Configuration loading for feedsmith.
 
 Feeds are declared in ``feeds.yaml``. Each entry binds a blog id to an extractor
 type plus the URLs and limits that extractor needs.

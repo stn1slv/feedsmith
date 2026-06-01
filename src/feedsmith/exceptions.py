@@ -1,4 +1,4 @@
-"""Custom exception hierarchy for LocalFeed.
+"""Custom exception hierarchy for feedsmith.
 
 Internal layers raise these; the CLI boundary (``cli.py``) is the only place
 that catches :class:`FeedsmithError` and maps it to a process exit code.
@@ -8,7 +8,7 @@ from __future__ import annotations
 
 
 class FeedsmithError(Exception):
-    """Base class for all LocalFeed errors."""
+    """Base class for all feedsmith errors."""
 
 
 class ConfigError(FeedsmithError):

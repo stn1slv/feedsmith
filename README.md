@@ -1,8 +1,8 @@
-# LocalFeed
+# feedsmith
 
 Generate Atom feeds for blogs that publish no official RSS/Atom feed.
 
-LocalFeed is a small CLI. Each blog is described in `feeds.yaml` and bound to an
+feedsmith is a small CLI. Each blog is described in `feeds.yaml` and bound to an
 *extractor* that knows how to read that site's structured data, then a shared
 builder serializes the posts to Atom 1.0.
 
