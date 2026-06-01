@@ -1,0 +1,14 @@
+feeds:
+  boomi:
+    title: "Boomi Blog"
+    extractor: wordpress_api
+    url: "https://boomi.com/wp-json/wp/v2/posts"
+    site_url: "https://boomi.com/blog/"
+    max_items: 20
+
+  kong:
+    title: "Kong Blog"
+    extractor: nextjs_blog
+    url: "https://konghq.com/blog/page/1"
+    site_url: "https://konghq.com/blog/"
+    max_items: 20

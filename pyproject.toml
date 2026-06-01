@@ -1,0 +1,80 @@
+[project]
+name = "feedsmith"
+version = "0.1.0"
+description = "Generate Atom feeds for blogs that publish no official feed."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "httpx>=0.28",
+    "feedgen>=1.0",
+    "pydantic>=2.10",
+    "pydantic-settings>=2.7",
+    "typer>=0.15",
+    "pyyaml>=6.0",
+    "structlog>=24.4",
+]
+
+[project.scripts]
+feedsmith = "feedsmith.cli:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "pytest-mock>=3.14",
+    "respx>=0.22",
+    "syrupy>=4.8",
+    "ruff>=0.9",
+    "mypy>=1.14",
+    "types-pyyaml>=6.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/feedsmith"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E", "W", "F", "I", "N", "UP", "B", "SIM", "S", "RUF", "ANN", "C4",
+    "PT", "T20", "DTZ", "PIE", "TRY", "PERF", "FURB", "LOG",
+]
+ignore = ["TRY003", "TRY300", "TRY301", "TRY400"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "ANN001", "ANN201", "ANN202", "S105", "S106", "N803", "N806", "T20", "DTZ001", "DTZ005", "S314"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+
+[[tool.mypy.overrides]]
+module = ["feedgen.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+addopts = "--cov=feedsmith --cov-report=term-missing --cov-fail-under=80"
+testpaths = ["tests"]
+markers = [
+    "unit: fast isolated tests",
+    "integration: tests that hit external services",
+]
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+exclude_lines = ["if TYPE_CHECKING:", "pragma: no cover"]

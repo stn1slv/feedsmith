@@ -1,0 +1,33 @@
+# serializer version: 1
+# name: test_build_atom_snapshot
+  '''
+  <?xml version='1.0' encoding='UTF-8'?>
+  <feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://example.com/blog/</id>
+    <title>Example Blog</title>
+    <updated>2026-02-01T09:00:00+00:00</updated>
+    <link href="https://example.com/blog/" rel="alternate"/>
+    <generator uri="https://lkiesow.github.io/python-feedgen" version="1.0.0">python-feedgen</generator>
+    <entry>
+      <id>https://example.com/blog/second</id>
+      <title>Second &amp; newest post</title>
+      <updated>2026-02-01T09:00:00+00:00</updated>
+      <author>
+        <name>Ada Lovelace</name>
+      </author>
+      <link href="https://example.com/blog/second"/>
+      <summary>Summary two.</summary>
+      <category term="news"/>
+      <published>2026-02-01T09:00:00+00:00</published>
+    </entry>
+    <entry>
+      <id>https://example.com/blog/first</id>
+      <title>First post</title>
+      <updated>2026-01-01T08:00:00+00:00</updated>
+      <link href="https://example.com/blog/first"/>
+      <published>2026-01-01T08:00:00+00:00</published>
+    </entry>
+  </feed>
+  
+  '''
+# ---
