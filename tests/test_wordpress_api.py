@@ -19,8 +19,8 @@ def test_fetch_maps_posts(boomi_config, boomi_json, client):
 
     assert len(posts) == 3
     first = posts[0]
-    assert first.id == "50462"
-    assert first.title == "Overview of Data Flows with Boomi"
+    assert first.id == "59371"
+    assert first.title == "How to Design APIs for Internal and External Consumers"
     assert first.published.tzinfo == UTC
     assert str(first.url).startswith("https://boomi.com/")
 

@@ -38,7 +38,7 @@ def boomi_config() -> FeedConfig:
         id="boomi",
         title="Boomi Blog",
         extractor="wordpress_api",
-        url="https://boomi.com/wp-json/wp/v2/posts",
+        url="https://boomi.com/wp-json/wp/v2/blog",
         site_url="https://boomi.com/blog/",
         max_items=20,
     )
