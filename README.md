@@ -24,6 +24,9 @@ make setup        # uv sync
 
 ## Usage
 
+Run the CLI with `uv run feedsmith <command>` (or via `make run ARGS="..."`).
+With no command it prints help.
+
 ```bash
 uv run feedsmith list                       # show configured feeds
 uv run feedsmith generate boomi             # Atom to stdout
@@ -31,8 +34,25 @@ uv run feedsmith generate kong -o kong.xml  # Atom to a file
 uv run feedsmith generate-all -o ./out      # write <id>.xml for every feed
 ```
 
-Add `--verbose` for debug logging, or `--config path/to/feeds.yaml` to use a
-different config.
+### Commands
+
+| Command | Argument | Description |
+|---------|----------|-------------|
+| `list` | — | Print each configured feed as `id<TAB>title<TAB>(extractor)`. |
+| `generate` | `FEED_ID` (required) | Build the Atom feed for one blog. Writes to stdout unless `-o` is given. |
+| `generate-all` | — | Build every configured feed. Requires `-o` (a directory); writes `<id>.xml` per feed. |
+
+### Options
+
+| Option | Applies to | Description |
+|--------|------------|-------------|
+| `-o`, `--output PATH` | `generate`, `generate-all` | For `generate`, a file path (default: stdout). For `generate-all`, a directory (created if missing); **required**. |
+| `-c`, `--config PATH` | all | Path to a `feeds.yaml` to use instead of the bundled config. |
+| `-v`, `--verbose` | all | Enable debug logging (to stderr). |
+| `--help` | all | Show help for the CLI or a specific command. |
+
+A failed run (bad config, unknown feed, fetch/parse error) logs the error and
+exits with status `1`.
 
 ## Adding a blog
 
