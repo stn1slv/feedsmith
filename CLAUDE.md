@@ -56,16 +56,20 @@ Extractors are strategies implementing the `Extractor` protocol (`extractors/bas
 `fetch(cfg: FeedConfig, client: httpx.Client) -> list[Post]`. They must **not** sort or
 truncate — the service layer does that. They map source data to the normalized `Post` model.
 
-Two extractors exist, and they fetch **structured data, not scraped HTML**:
+Three extractors exist. Two fetch **structured data**; one scrapes rendered HTML:
 - `wordpress_api` (`extractors/wordpress_api.py`): WordPress REST API (`wp-json/wp/v2/posts`).
   Generic — adding another WordPress blog is a `feeds.yaml`-only change.
 - `nextjs_blog` (`extractors/nextjs_blog.py`): pulls the `__NEXT_DATA__` JSON blob out of the
   page and reads `props.pageProps.cardsPaged.cards`.
+- `bump_blog` (`extractors/bump_blog.py`): the Bump.sh blog is a Bridgetown static site with no
+  embedded JSON, so this extractor parses the rendered "Recent posts" cards with **BeautifulSoup**
+  (CSS-class selectors over `html.parser`). Dates are `MM/DD/YYYY` and stamped UTC; no author is
+  exposed by the source.
 
 `extractors/base.py` also provides `clean_text()` — a deliberately narrow regex tag-stripper
-for short title/excerpt snippets. It is **not** an HTML parser; there is no BeautifulSoup/lxml
-dependency. A full HTML parser is only warranted if a future source requires parsing rendered
-HTML with selectors.
+for short title/excerpt snippets. It is **not** an HTML parser. The one real HTML parser
+(`beautifulsoup4`, used by `bump_blog`) was added only because that source requires parsing
+rendered HTML with selectors; prefer structured-data extraction where a source offers it.
 
 `extractors/registry.py` maps extractor-type name → implementation and raises `UnknownFeedError`
 for unknown types.
@@ -84,7 +88,7 @@ Custom hierarchy in `exceptions.py`: `FeedsmithError` (base) → `ConfigError`, 
 ## Conventions specific to this repo
 
 - **Tests never hit the network.** Extractor/service/CLI tests mock httpx with `respx` and feed
-  recorded responses from `tests/fixtures/` (`boomi_posts.json`, `kong_blog.html`). Keep it that way.
+  recorded responses from `tests/fixtures/` (`boomi_posts.json`, `kong_blog.html`, `bump_blog.html`). Keep it that way.
 - `Post.published` must be **timezone-aware** (a validator enforces this). WordPress `date_gmt`
   is UTC-without-offset and is stamped UTC; Next.js `publishedAt` carries a `Z`.
 - structlog logging is configured with `cache_logger_on_first_use=False` on purpose, so the

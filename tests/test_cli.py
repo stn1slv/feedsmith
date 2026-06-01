@@ -43,11 +43,15 @@ def test_unknown_feed_exits_nonzero():
 
 
 @respx.mock
-def test_generate_all(boomi_config, kong_config, boomi_json, kong_html, tmp_path: Path):
+def test_generate_all(
+    boomi_config, kong_config, bump_config, boomi_json, kong_html, bump_html, tmp_path: Path
+):
     respx.get(boomi_config.url).mock(return_value=httpx.Response(200, text=boomi_json))
     respx.get(kong_config.url).mock(return_value=httpx.Response(200, text=kong_html))
+    respx.get(bump_config.url).mock(return_value=httpx.Response(200, text=bump_html))
     out_dir = tmp_path / "out"
     result = runner.invoke(app, ["generate-all", "-o", str(out_dir)])
     assert result.exit_code == 0
     assert (out_dir / "boomi.xml").exists()
     assert (out_dir / "kong.xml").exists()
+    assert (out_dir / "bump.xml").exists()
