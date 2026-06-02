@@ -19,3 +19,10 @@ feeds:
     url: "https://bump.sh/blog/"
     site_url: "https://bump.sh/blog/"
     max_items: 20
+
+  treblle:
+    title: "Treblle Blog"
+    extractor: sanity_blog
+    url: "https://y0t5b9p5.apicdn.sanity.io/v2021-10-21/data/query/production"
+    site_url: "https://treblle.com/blog/"
+    max_items: 20

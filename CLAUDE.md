@@ -56,11 +56,15 @@ Extractors are strategies implementing the `Extractor` protocol (`extractors/bas
 `fetch(cfg: FeedConfig, client: httpx.Client) -> list[Post]`. They must **not** sort or
 truncate — the service layer does that. They map source data to the normalized `Post` model.
 
-Three extractors exist. Two fetch **structured data**; one scrapes rendered HTML:
+Four extractors exist. Three fetch **structured data**; one scrapes rendered HTML:
 - `wordpress_api` (`extractors/wordpress_api.py`): WordPress REST API (`wp-json/wp/v2/posts`).
   Generic — adding another WordPress blog is a `feeds.yaml`-only change.
 - `nextjs_blog` (`extractors/nextjs_blog.py`): pulls the `__NEXT_DATA__` JSON blob out of the
   page and reads `props.pageProps.cardsPaged.cards`.
+- `sanity_blog` (`extractors/sanity_blog.py`): the Treblle blog is a Next.js App Router site
+  (no `__NEXT_DATA__`) whose content lives in a **public Sanity CMS**, queried over the GROQ
+  API with no auth. The GROQ projection is tuned to a `blogPost` schema; dates are ISO 8601
+  with a `Z` (tz-aware as-is); Treblle's dataset exposes no author/category.
 - `bump_blog` (`extractors/bump_blog.py`): the Bump.sh blog is a Bridgetown static site with no
   embedded JSON, so this extractor parses the rendered "Recent posts" cards with **BeautifulSoup**
   (CSS-class selectors over `html.parser`). Dates are `MM/DD/YYYY` and stamped UTC; no author is
@@ -88,7 +92,8 @@ Custom hierarchy in `exceptions.py`: `FeedsmithError` (base) → `ConfigError`, 
 ## Conventions specific to this repo
 
 - **Tests never hit the network.** Extractor/service/CLI tests mock httpx with `respx` and feed
-  recorded responses from `tests/fixtures/` (`boomi_posts.json`, `kong_blog.html`, `bump_blog.html`). Keep it that way.
+  recorded responses from `tests/fixtures/` (`boomi_posts.json`, `kong_blog.html`, `bump_blog.html`,
+  `treblle_blog.json`). Keep it that way.
 - `Post.published` must be **timezone-aware** (a validator enforces this). WordPress `date_gmt`
   is UTC-without-offset and is stamped UTC; Next.js `publishedAt` carries a `Z`.
 - structlog logging is configured with `cache_logger_on_first_use=False` on purpose, so the
