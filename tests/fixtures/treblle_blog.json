@@ -1,0 +1,34 @@
+{
+    "query": "*[_type==\"blogPost\" && defined(slug.current)]{\"id\": slug.current, title, \"slug\": slug.current, excerpt, \"published\": coalesce(publishedAt, _createdAt), \"author\": author->name}",
+    "result": [
+        {
+            "author": null,
+            "excerpt": "Headless architecture is changing API observability forever. As AI agents replace traditional UIs, failures no longer surface through broken screens or user complaints. This article explores why traditional monitoring breaks down in headless environments and what modern API teams need instead: full payload visibility, consumer intelligence, real-time ingestion, and predictive runtime observability.",
+            "id": "headless-ui-bridging-observability-gap",
+            "published": "2026-05-15T11:27:00.000Z",
+            "slug": "headless-ui-bridging-observability-gap",
+            "title": "Headless UI: Bridging the Observability Gap"
+        },
+        {
+            "author": null,
+            "excerpt": "DORA Article 8 requires financial institutions to continuously identify, classify, and document all ICT assets \u2014 including APIs. This article explains why CMDBs and API gateways alone leave critical visibility gaps, how shadow APIs create direct compliance exposure, and why runtime API discovery is becoming essential for DORA compliance.",
+            "id": "dora-article-8-compliance-apis-you-don-t-know-you-have",
+            "published": "2026-05-28T13:01:00.000Z",
+            "slug": "dora-article-8-compliance-apis-you-don-t-know-you-have",
+            "title": "DORA Article 8 Compliance: Shadow APIs & Runtime Discovery"
+        },
+        {
+            "author": null,
+            "excerpt": "AI gateways extend traditional API infrastructure for the realities of LLM traffic: token-based pricing, variable latency, prompt security risks, and multi-provider routing. This guide explains what AI gateways actually do, how they differ from standard API gateways, and why observability, governance, and AI readiness are essential for operating AI-powered APIs in production.",
+            "id": "ai-gateway-what-it-is-and-when-you-need-one",
+            "published": "2026-05-21T10:29:00.000Z",
+            "slug": "ai-gateway-what-it-is-and-when-you-need-one",
+            "title": "AI Gateway: What It Is and When You Need One"
+        }
+    ],
+    "syncTags": [
+        "s1:+D/vsA",
+        "s1:vGuRMw"
+    ],
+    "ms": 5
+}

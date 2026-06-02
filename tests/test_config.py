@@ -12,7 +12,7 @@ from feedsmith.exceptions import ConfigError, UnknownFeedError
 
 def test_load_default_config_has_expected_feeds():
     config = load_config()
-    assert config.ids() == ["boomi", "bump", "kong"]
+    assert config.ids() == ["boomi", "bump", "kong", "treblle"]
     boomi = config.get("boomi")
     assert boomi.id == "boomi"
     assert boomi.extractor == "wordpress_api"

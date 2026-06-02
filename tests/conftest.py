@@ -38,6 +38,11 @@ def bump_html() -> str:
 
 
 @pytest.fixture
+def treblle_json() -> str:
+    return (FIXTURES / "treblle_blog.json").read_text(encoding="utf-8")
+
+
+@pytest.fixture
 def boomi_config() -> FeedConfig:
     return FeedConfig(
         id="boomi",
@@ -69,6 +74,18 @@ def bump_config() -> FeedConfig:
         extractor="bump_blog",
         url="https://bump.sh/blog/",
         site_url="https://bump.sh/blog/",
+        max_items=20,
+    )
+
+
+@pytest.fixture
+def treblle_config() -> FeedConfig:
+    return FeedConfig(
+        id="treblle",
+        title="Treblle Blog",
+        extractor="sanity_blog",
+        url="https://y0t5b9p5.apicdn.sanity.io/v2021-10-21/data/query/production",
+        site_url="https://treblle.com/blog/",
         max_items=20,
     )
 
