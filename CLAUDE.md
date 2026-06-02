@@ -99,3 +99,15 @@ Custom hierarchy in `exceptions.py`: `FeedsmithError` (base) → `ConfigError`, 
 - structlog logging is configured with `cache_logger_on_first_use=False` on purpose, so the
   bound logger tracks the current stderr (this matters under pytest's stream capture; the
   autouse `_configure_logging` fixture in `conftest.py` rebinds per test).
+
+## Git workflow
+
+- **Never commit or push directly to `main`.** All changes go through a feature branch
+  and a PR. Before any `git commit`/`git push`, run `git branch --show-current` and confirm
+  you are **not** on `main` — a prior PR merge can leave the local checkout back on `main`.
+  If you find yourself on `main` with uncommitted work, create a branch first.
+- **Version bumps touch three files, keep them in sync:** `pyproject.toml` (`version`),
+  `src/feedsmith/__init__.py` (`__version__`), and `uv.lock` (re-run `uv lock` after editing
+  the first two). A feature (new extractor/source) is a **minor** bump; a fix is a **patch**.
+- When adding a source, update **all** of: `feeds.yaml`, `registry.py`, the extractor list in
+  this file, and the "Supported sources" table in `README.md`.
