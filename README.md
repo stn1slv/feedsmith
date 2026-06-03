@@ -20,6 +20,14 @@ config-only change in `feeds.yaml`.
 
 ## Install
 
+Install via [Homebrew](https://brew.sh):
+
+```bash
+brew install stn1slv/tap/feedsmith
+```
+
+For development (from a checkout):
+
 ```bash
 make setup        # uv sync
 ```
