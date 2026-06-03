@@ -18,8 +18,9 @@ def test_load_default_config_has_expected_feeds():
     assert boomi.extractor == "wordpress_api"
 
 
-def test_default_config_path_points_to_repo_root():
+def test_default_config_path_is_bundled_in_package():
     assert DEFAULT_CONFIG_PATH.name == "feeds.yaml"
+    assert DEFAULT_CONFIG_PATH.parent.name == "feedsmith"
     assert DEFAULT_CONFIG_PATH.exists()
 
 
