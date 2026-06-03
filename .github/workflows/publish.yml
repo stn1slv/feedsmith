@@ -57,11 +57,15 @@ jobs:
         env:
           TAG: ${{ github.ref_name }}
         run: |
+          set -euo pipefail
           URL="https://github.com/stn1slv/feedsmith/archive/refs/tags/${TAG}.tar.gz"
           SHA256=""
           for i in 1 2 3; do
-            SHA256=$(curl -fsSL "$URL" | sha256sum | awk '{print $1}') || true
-            if [ -n "$SHA256" ]; then break; fi
+            # Download to a file (not a pipe) so a truncated body can't be hashed as if complete.
+            if curl -fsSL -o archive.tar.gz "$URL" && [ -s archive.tar.gz ]; then
+              SHA256=$(sha256sum archive.tar.gz | awk '{print $1}')
+              break
+            fi
             echo "Archive not ready, retrying in 15s (attempt $i/3)..."
             sleep 15
           done
@@ -79,6 +83,7 @@ jobs:
         env:
           TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
           git clone "https://x-access-token:${TAP_GITHUB_TOKEN}@github.com/stn1slv/homebrew-tap.git"
           cd homebrew-tap
           git config user.name  "github-actions[bot]"

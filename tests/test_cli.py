@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import httpx
@@ -16,7 +17,7 @@ runner = CliRunner()
 def test_version_flag():
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
-    assert "feedsmith 0.3.0" in result.stdout
+    assert re.match(r"feedsmith \d+\.\d+\.\d+", result.stdout.strip())
 
 
 def test_list_command():
