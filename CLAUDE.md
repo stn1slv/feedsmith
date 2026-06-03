@@ -80,9 +80,11 @@ for unknown types.
 
 ### Config
 
-`feeds.yaml` (repo root) is the source of truth: `feed id → {title, extractor, url, site_url,
-max_items}`. `config.py` loads it into Pydantic `AppConfig`/`FeedConfig`, injecting the mapping
-key as each feed's `id`. All config problems surface as `ConfigError`.
+`src/feedsmith/feeds.yaml` (bundled inside the package so it ships in the wheel) is the source
+of truth: `feed id → {title, extractor, url, site_url, max_items}`. `config.py` resolves it
+package-relative (`Path(__file__).resolve().parent / "feeds.yaml"`) and loads it into Pydantic
+`AppConfig`/`FeedConfig`, injecting the mapping key as each feed's `id`. All config problems
+surface as `ConfigError`.
 
 ### Errors
 

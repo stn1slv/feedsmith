@@ -1,0 +1,103 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Lint and test
+    runs-on: ubuntu-latest
+    if: github.event.release.target_commitish == 'main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+      - name: Set up Python
+        run: uv python pin 3.13
+      - name: Install dependencies
+        run: uv sync --frozen
+      - name: Run lint
+        run: make lint
+      - name: Run unit tests
+        run: make test
+
+  validate-version:
+    name: Validate tag matches version
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+      - name: Validate version
+        run: |
+          TAG_VERSION=${GITHUB_REF_NAME#v}
+          TOML_VERSION=$(uv run python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          if [ "$TAG_VERSION" != "$TOML_VERSION" ]; then
+            echo "Error: Tag version ($TAG_VERSION) does not match pyproject.toml version ($TOML_VERSION)"
+            exit 1
+          fi
+
+  update-homebrew-tap:
+    name: Update Homebrew tap
+    runs-on: ubuntu-latest
+    needs: validate-version
+    concurrency:
+      group: homebrew-tap-update
+      cancel-in-progress: false
+    steps:
+      - name: Compute GitHub-archive sha256 (with retry)
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          URL="https://github.com/stn1slv/feedsmith/archive/refs/tags/${TAG}.tar.gz"
+          SHA256=""
+          for i in 1 2 3; do
+            SHA256=$(curl -fsSL "$URL" | sha256sum | awk '{print $1}') || true
+            if [ -n "$SHA256" ]; then break; fi
+            echo "Archive not ready, retrying in 15s (attempt $i/3)..."
+            sleep 15
+          done
+          if [ -z "$SHA256" ]; then
+            echo "ERROR: Could not fetch archive tarball from GitHub after 3 retries" >&2
+            exit 1
+          fi
+          {
+            echo "URL=${URL}"
+            echo "SHA256=${SHA256}"
+            echo "VERSION=${TAG#v}"
+          } >> "$GITHUB_ENV"
+
+      - name: Clone homebrew-tap and update formula
+        env:
+          TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+        run: |
+          git clone "https://x-access-token:${TAP_GITHUB_TOKEN}@github.com/stn1slv/homebrew-tap.git"
+          cd homebrew-tap
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          sed -i "s|  url \"https://github.com/stn1slv/feedsmith/archive/refs/tags/.*\.tar\.gz\"|  url \"${URL}\"|" \
+            Formula/feedsmith.rb
+          sed -i "0,/  sha256 \"[a-f0-9]*\"/{s|  sha256 \"[a-f0-9]*\"|  sha256 \"${SHA256}\"|}" Formula/feedsmith.rb
+
+          if ! grep -qF "  url \"${URL}\"" Formula/feedsmith.rb; then
+            echo "ERROR: URL substitution made no change — formula URL pattern may have drifted" >&2
+            exit 1
+          fi
+          if ! grep -qF "  sha256 \"${SHA256}\"" Formula/feedsmith.rb; then
+            echo "ERROR: SHA256 substitution made no change — formula sha256 pattern may have drifted" >&2
+            exit 1
+          fi
+
+          git add Formula/feedsmith.rb
+          git commit -m "chore: bump feedsmith to v${VERSION}"
+          git pull --rebase
+          git push

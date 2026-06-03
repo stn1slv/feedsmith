@@ -7,6 +7,7 @@ exits with a non-zero status. Internal layers let errors propagate.
 from __future__ import annotations
 
 import logging
+from importlib.metadata import version as _pkg_version
 from pathlib import Path
 from typing import Annotated
 
@@ -30,6 +31,27 @@ ConfigOption = Annotated[
     typer.Option("--config", "-c", help="Path to feeds.yaml (defaults to the bundled config)."),
 ]
 VerboseOption = Annotated[bool, typer.Option("--verbose", "-v", help="Enable debug logging.")]
+
+
+def _version_callback(value: bool) -> None:
+    if value:
+        typer.echo(f"feedsmith {_pkg_version('feedsmith')}")
+        raise typer.Exit
+
+
+@app.callback()
+def main(
+    version: Annotated[
+        bool,
+        typer.Option(
+            "--version",
+            callback=_version_callback,
+            is_eager=True,
+            help="Show the version and exit.",
+        ),
+    ] = False,
+) -> None:
+    """Generate Atom feeds for blogs that publish no official feed."""
 
 
 @app.command("list")

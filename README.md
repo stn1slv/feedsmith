@@ -58,7 +58,7 @@ exits with status `1`.
 
 ## Adding a blog
 
-1. Add an entry under `feeds:` in `feeds.yaml` (id, title, extractor, url, site_url).
+1. Add an entry under `feeds:` in `src/feedsmith/feeds.yaml` (id, title, extractor, url, site_url).
 2. If the site needs a new extraction strategy, add an extractor in
    `src/feedsmith/extractors/` and register it in `registry.py`.
 

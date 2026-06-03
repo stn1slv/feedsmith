@@ -1,8 +1,9 @@
 [project]
 name = "feedsmith"
-version = "0.2.0"
+version = "0.3.0"
 description = "Generate Atom feeds for blogs that publish no official feed."
 readme = "README.md"
+license = { text = "MIT" }
 requires-python = ">=3.13"
 dependencies = [
     "httpx>=0.28",

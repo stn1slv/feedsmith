@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field, ValidationError
 
 from feedsmith.exceptions import ConfigError, UnknownFeedError
 
-DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[2] / "feeds.yaml"
+DEFAULT_CONFIG_PATH = Path(__file__).resolve().parent / "feeds.yaml"
 
 
 class FeedConfig(BaseModel):
@@ -49,7 +49,8 @@ def load_config(path: Path | None = None) -> AppConfig:
     """Load and validate ``feeds.yaml``.
 
     Args:
-        path: Optional override path. Defaults to the repo-root ``feeds.yaml``.
+        path: Optional override path. Defaults to the ``feeds.yaml`` bundled
+            inside the package.
 
     Raises:
         ConfigError: If the file is missing, malformed, or fails validation.

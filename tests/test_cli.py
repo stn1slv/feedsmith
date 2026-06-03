@@ -13,6 +13,12 @@ from feedsmith.cli import app
 runner = CliRunner()
 
 
+def test_version_flag():
+    result = runner.invoke(app, ["--version"])
+    assert result.exit_code == 0
+    assert "feedsmith 0.3.0" in result.stdout
+
+
 def test_list_command():
     result = runner.invoke(app, ["list"])
     assert result.exit_code == 0
