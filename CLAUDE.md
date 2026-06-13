@@ -56,7 +56,7 @@ Extractors are strategies implementing the `Extractor` protocol (`extractors/bas
 `fetch(cfg: FeedConfig, client: httpx.Client) -> list[Post]`. They must **not** sort or
 truncate — the service layer does that. They map source data to the normalized `Post` model.
 
-Four extractors exist. Three fetch **structured data**; one scrapes rendered HTML:
+Five extractors exist. Four fetch **structured data**; one scrapes rendered HTML:
 - `wordpress_api` (`extractors/wordpress_api.py`): WordPress REST API (`wp-json/wp/v2/posts`).
   Generic — adding another WordPress blog is a `feeds.yaml`-only change.
 - `nextjs_blog` (`extractors/nextjs_blog.py`): pulls the `__NEXT_DATA__` JSON blob out of the
@@ -69,6 +69,15 @@ Four extractors exist. Three fetch **structured data**; one scrapes rendered HTM
   embedded JSON, so this extractor parses the rendered "Recent posts" cards with **BeautifulSoup**
   (CSS-class selectors over `html.parser`). Dates are `MM/DD/YYYY` and stamped UTC; no author is
   exposed by the source.
+- `google_books` (`extractors/google_books.py`): backs the `books-*` feed family — recent
+  **English** **Computers & Technology** books matching a per-feed search term, via the free,
+  no-auth Google Books volumes API. The category (`subject:Computers`) and `langRestrict=en`
+  are fixed in the extractor; the search term comes from `FeedConfig.query`, so adding a query
+  is a `feeds.yaml`-only change. `publishedDate` has variable precision (`2024`, `2024-03`,
+  `2024-03-15`) — padded to day 1 and stamped UTC; volumes with no usable date or a non-`en`
+  language are skipped. An optional API key (raises the anonymous quota / avoids `429`) is read
+  from the `GOOGLE_BOOKS_API_KEY` env var and appended as `key`; it is never put in `feeds.yaml`
+  (which ships in the wheel) or logged.
 
 `extractors/base.py` also provides `clean_text()` — a deliberately narrow regex tag-stripper
 for short title/excerpt snippets. It is **not** an HTML parser. The one real HTML parser
@@ -95,7 +104,7 @@ Custom hierarchy in `exceptions.py`: `FeedsmithError` (base) → `ConfigError`, 
 
 - **Tests never hit the network.** Extractor/service/CLI tests mock httpx with `respx` and feed
   recorded responses from `tests/fixtures/` (`boomi_posts.json`, `kong_blog.html`, `bump_blog.html`,
-  `treblle_blog.json`). Keep it that way.
+  `treblle_blog.json`, `google_books.json`). Keep it that way.
 - `Post.published` must be **timezone-aware** (a validator enforces this). WordPress `date_gmt`
   is UTC-without-offset and is stamped UTC; Next.js `publishedAt` carries a `Z`.
 - structlog logging is configured with `cache_logger_on_first_use=False` on purpose, so the

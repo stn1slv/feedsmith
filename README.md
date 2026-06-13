@@ -14,9 +14,24 @@ builder serializes the posts to Atom 1.0.
 | `kong`  | https://konghq.com/blog/ | `nextjs_blog` | Embedded `__NEXT_DATA__` JSON |
 | `bump`  | https://bump.sh/blog/ | `bump_blog` | Rendered HTML cards (BeautifulSoup) |
 | `treblle` | https://treblle.com/blog/ | `sanity_blog` | Public Sanity CMS (GROQ query API) |
+| `books-*` | https://books.google.com/ | `google_books` | Google Books API (English Computers & Technology books) |
 
 The `wordpress_api` extractor is generic: adding another WordPress blog is a
 config-only change in `feeds.yaml`.
+
+The `google_books` extractor backs a family of `books-*` feeds — one per search
+term (`books-mulesoft`, `books-kafka`, `books-api-management`, …), each listing
+recent **English** books in the **Computers & Technology** category that match
+the term. Adding a new query is a `feeds.yaml`-only change: copy a `books-*`
+block and set its `id`, `title`, `query`, and `site_url`.
+
+The Google Books API works without credentials but shares a low anonymous quota
+(you may hit `HTTP 429`). To raise it, create an API key in the Google Cloud
+Console and set it in the environment — feedsmith picks it up automatically:
+
+```sh
+export GOOGLE_BOOKS_API_KEY="your-api-key"
+```
 
 ## Install
 

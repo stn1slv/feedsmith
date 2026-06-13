@@ -25,6 +25,10 @@ class FeedConfig(BaseModel):
     url: str = Field(..., description="Source URL the extractor fetches.")
     site_url: str = Field(..., description="Human-facing blog URL for feed metadata.")
     max_items: int = Field(default=20, ge=1, le=200)
+    query: str | None = Field(
+        default=None,
+        description="Search term for query-based extractors (e.g. google_books).",
+    )
 
 
 class AppConfig(BaseModel):

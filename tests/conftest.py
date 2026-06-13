@@ -43,6 +43,11 @@ def treblle_json() -> str:
 
 
 @pytest.fixture
+def google_books_json() -> str:
+    return (FIXTURES / "google_books.json").read_text(encoding="utf-8")
+
+
+@pytest.fixture
 def boomi_config() -> FeedConfig:
     return FeedConfig(
         id="boomi",
@@ -86,6 +91,19 @@ def treblle_config() -> FeedConfig:
         extractor="sanity_blog",
         url="https://y0t5b9p5.apicdn.sanity.io/v2021-10-21/data/query/production",
         site_url="https://treblle.com/blog/",
+        max_items=20,
+    )
+
+
+@pytest.fixture
+def books_config() -> FeedConfig:
+    return FeedConfig(
+        id="books-mulesoft",
+        title="Books: MuleSoft (Computers & Technology)",
+        extractor="google_books",
+        url="https://www.googleapis.com/books/v1/volumes",
+        site_url="https://books.google.com/books?q=MuleSoft+subject:Computers",
+        query="MuleSoft",
         max_items=20,
     )
 

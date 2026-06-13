@@ -26,3 +26,118 @@ feeds:
     url: "https://y0t5b9p5.apicdn.sanity.io/v2021-10-21/data/query/production"
     site_url: "https://treblle.com/blog/"
     max_items: 20
+
+  # Computers & Technology books (English) from the Google Books API. Adding a new
+  # query is a feeds.yaml-only change: copy a block and change the id, title, query,
+  # and site_url. Multi-word terms are quoted to force phrase matching.
+  books-mulesoft:
+    title: "Books: MuleSoft (Computers & Technology)"
+    extractor: google_books
+    url: "https://www.googleapis.com/books/v1/volumes"
+    site_url: "https://books.google.com/books?q=MuleSoft+subject:Computers"
+    query: "MuleSoft"
+    max_items: 20
+
+  books-integration:
+    title: "Books: Integration (Computers & Technology)"
+    extractor: google_books
+    url: "https://www.googleapis.com/books/v1/volumes"
+    site_url: "https://books.google.com/books?q=Integration+subject:Computers"
+    query: "Integration"
+    max_items: 20
+
+  books-api:
+    title: "Books: API (Computers & Technology)"
+    extractor: google_books
+    url: "https://www.googleapis.com/books/v1/volumes"
+    site_url: "https://books.google.com/books?q=API+subject:Computers"
+    query: "API"
+    max_items: 20
+
+  books-mcp:
+    title: "Books: Model Context Protocol (Computers & Technology)"
+    extractor: google_books
+    url: "https://www.googleapis.com/books/v1/volumes"
+    site_url: 'https://books.google.com/books?q="Model+Context+Protocol"+subject:Computers'
+    query: '"Model Context Protocol"'
+    max_items: 20
+
+  books-kafka:
+    title: "Books: Apache Kafka (Computers & Technology)"
+    extractor: google_books
+    url: "https://www.googleapis.com/books/v1/volumes"
+    site_url: 'https://books.google.com/books?q="Apache+Kafka"+subject:Computers'
+    query: '"Apache Kafka"'
+    max_items: 20
+
+  books-camel:
+    title: "Books: Apache Camel (Computers & Technology)"
+    extractor: google_books
+    url: "https://www.googleapis.com/books/v1/volumes"
+    site_url: 'https://books.google.com/books?q="Apache+Camel"+subject:Computers'
+    query: '"Apache Camel"'
+    max_items: 20
+
+  books-boomi:
+    title: "Books: Boomi (Computers & Technology)"
+    extractor: google_books
+    url: "https://www.googleapis.com/books/v1/volumes"
+    site_url: "https://books.google.com/books?q=Boomi+subject:Computers"
+    query: "Boomi"
+    max_items: 20
+
+  books-tibco:
+    title: "Books: TIBCO (Computers & Technology)"
+    extractor: google_books
+    url: "https://www.googleapis.com/books/v1/volumes"
+    site_url: "https://books.google.com/books?q=Tibco+subject:Computers"
+    query: "Tibco"
+    max_items: 20
+
+  books-webmethods:
+    title: "Books: webMethods (Computers & Technology)"
+    extractor: google_books
+    url: "https://www.googleapis.com/books/v1/volumes"
+    site_url: "https://books.google.com/books?q=webMethods+subject:Computers"
+    query: "webMethods"
+    max_items: 20
+
+  books-apigee:
+    title: "Books: Apigee (Computers & Technology)"
+    extractor: google_books
+    url: "https://www.googleapis.com/books/v1/volumes"
+    site_url: "https://books.google.com/books?q=Apigee+subject:Computers"
+    query: "Apigee"
+    max_items: 20
+
+  books-kong:
+    title: "Books: Kong Gateway (Computers & Technology)"
+    extractor: google_books
+    url: "https://www.googleapis.com/books/v1/volumes"
+    site_url: 'https://books.google.com/books?q="Kong+Gateway"+subject:Computers'
+    query: '"Kong Gateway"'
+    max_items: 20
+
+  books-api-management:
+    title: "Books: API Management (Computers & Technology)"
+    extractor: google_books
+    url: "https://www.googleapis.com/books/v1/volumes"
+    site_url: 'https://books.google.com/books?q="API+Management"+subject:Computers'
+    query: '"API Management"'
+    max_items: 20
+
+  books-ai-gateway:
+    title: "Books: AI Gateway (Computers & Technology)"
+    extractor: google_books
+    url: "https://www.googleapis.com/books/v1/volumes"
+    site_url: 'https://books.google.com/books?q="AI+Gateway"+subject:Computers'
+    query: '"AI Gateway"'
+    max_items: 20
+
+  books-ai-management:
+    title: "Books: AI Management (Computers & Technology)"
+    extractor: google_books
+    url: "https://www.googleapis.com/books/v1/volumes"
+    site_url: 'https://books.google.com/books?q="AI+Management"+subject:Computers'
+    query: '"AI Management"'
+    max_items: 20

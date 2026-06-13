@@ -12,10 +12,33 @@ from feedsmith.exceptions import ConfigError, UnknownFeedError
 
 def test_load_default_config_has_expected_feeds():
     config = load_config()
-    assert config.ids() == ["boomi", "bump", "kong", "treblle"]
+    assert config.ids() == [
+        "books-ai-gateway",
+        "books-ai-management",
+        "books-api",
+        "books-api-management",
+        "books-apigee",
+        "books-boomi",
+        "books-camel",
+        "books-integration",
+        "books-kafka",
+        "books-kong",
+        "books-mcp",
+        "books-mulesoft",
+        "books-tibco",
+        "books-webmethods",
+        "boomi",
+        "bump",
+        "kong",
+        "treblle",
+    ]
     boomi = config.get("boomi")
     assert boomi.id == "boomi"
     assert boomi.extractor == "wordpress_api"
+
+    books = config.get("books-mulesoft")
+    assert books.extractor == "google_books"
+    assert books.query == "MuleSoft"
 
 
 def test_default_config_path_is_bundled_in_package():
