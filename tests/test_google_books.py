@@ -86,6 +86,40 @@ def test_non_string_text_fields_are_tolerated(books_config, client):
     assert posts[0].summary is None  # non-string description ignored
 
 
+@respx.mock
+def test_malformed_volumes_are_skipped_not_fatal(books_config, client):
+    # A single bad volume must be skipped, never abort the whole feed.
+    good = {
+        "id": "good",
+        "volumeInfo": {
+            "title": "Good Book",
+            "publishedDate": "2026-05-10",
+            "language": "en",
+            "canonicalVolumeLink": "https://books.google.com/books?id=good",
+        },
+    }
+    payload = {
+        "items": [
+            {"id": "no-volumeinfo"},  # volumeInfo missing
+            {"id": "bad-volumeinfo", "volumeInfo": "nope"},  # volumeInfo not a dict
+            {"volumeInfo": {**good["volumeInfo"]}},  # missing id
+            {"id": "no-url", "volumeInfo": {"title": "X", "publishedDate": "2026-05-10", "language": "en"}},
+            {
+                "id": "no-title",
+                "volumeInfo": {
+                    "publishedDate": "2026-05-10",
+                    "language": "en",
+                    "canonicalVolumeLink": "https://books.google.com/books?id=no-title",
+                },
+            },
+            good,
+        ]
+    }
+    respx.get(books_config.url).mock(return_value=httpx.Response(200, json=payload))
+    posts = GoogleBooksExtractor().fetch(books_config, client)
+    assert [p.id for p in posts] == ["good"]
+
+
 @pytest.mark.parametrize(
     ("now", "expected"),
     [
