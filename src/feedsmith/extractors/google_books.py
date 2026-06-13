@@ -82,7 +82,9 @@ class GoogleBooksExtractor:
             "printType": "books",
             "langRestrict": "en",
             "country": "US",
-            "maxResults": min(cfg.max_items, _MAX_RESULTS),
+            # Always request a full page: client-side filters (recency, language)
+            # thin the results, so let the service layer truncate to max_items.
+            "maxResults": _MAX_RESULTS,
         }
         api_key = os.environ.get(_API_KEY_ENV)
         if api_key:
@@ -161,10 +163,11 @@ class GoogleBooksExtractor:
     @staticmethod
     def _parse_date(value: object) -> datetime | None:
         # publishedDate has variable precision and no timezone: "2024",
-        # "2024-03", or "2024-03-15". Pad missing parts and stamp UTC.
+        # "2024-03", or "2024-03-15" (rarely a full ISO timestamp). Drop any time
+        # component, pad missing date parts, and stamp UTC.
         if not isinstance(value, str) or not value:
             return None
-        parts = value.split("-")
+        parts = value.split("T")[0].split("-")
         try:
             year = int(parts[0])
             month = int(parts[1]) if len(parts) > 1 else 1

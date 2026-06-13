@@ -99,6 +99,39 @@ def test_min_published_is_two_months_before(now, expected):
 
 
 @respx.mock
+def test_requests_full_page_regardless_of_max_items(books_config, google_books_json, client):
+    # Request the full page (40) so client-side filters don't starve the feed;
+    # the service layer truncates to max_items afterward.
+    assert books_config.max_items == 20
+    route = respx.get(books_config.url).mock(
+        return_value=httpx.Response(200, text=google_books_json)
+    )
+    GoogleBooksExtractor().fetch(books_config, client)
+    assert route.calls.last.request.url.params["maxResults"] == "40"
+
+
+@respx.mock
+def test_full_iso_timestamp_is_parsed(books_config, client):
+    payload = {
+        "items": [
+            {
+                "id": "iso001",
+                "volumeInfo": {
+                    "title": "Timestamped Book",
+                    "publishedDate": "2026-05-12T00:00:00Z",
+                    "language": "en",
+                    "canonicalVolumeLink": "https://books.google.com/books?id=iso001",
+                },
+            }
+        ]
+    }
+    respx.get(books_config.url).mock(return_value=httpx.Response(200, json=payload))
+    posts = GoogleBooksExtractor().fetch(books_config, client)
+    assert len(posts) == 1
+    assert (posts[0].published.year, posts[0].published.month, posts[0].published.day) == (2026, 5, 12)
+
+
+@respx.mock
 def test_books_before_cutoff_are_excluded(books_config, client):
     # The cutoff is inclusive: 2026-05-01 is kept; the day before is dropped.
     payload = {
