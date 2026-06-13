@@ -10,6 +10,7 @@ project's no-secrets / structured-data ethos. The per-feed search term comes fro
 
 from __future__ import annotations
 
+import calendar
 import os
 from datetime import UTC, datetime
 from typing import Any
@@ -31,10 +32,33 @@ _SUBJECT = "subject:Computers"
 # Google Books caps maxResults at 40; the service layer truncates to max_items.
 _MAX_RESULTS = 40
 
+# Only surface recent books: drop anything published before this many months ago.
+_RECENCY_MONTHS = 2
+
 # Optional API key. Without it the API works but shares a low anonymous quota
 # (HTTP 429); a key raises the quota. Kept in the environment, never in feeds.yaml
 # (which ships inside the wheel) and never logged.
 _API_KEY_ENV = "GOOGLE_BOOKS_API_KEY"
+
+
+def _now() -> datetime:
+    """Current UTC time. A seam so the recency cutoff can be frozen in tests."""
+    return datetime.now(UTC)
+
+
+def _min_published(now: datetime) -> datetime:
+    """The recency cutoff: ``_RECENCY_MONTHS`` calendar months before ``now``.
+
+    Day is clamped so e.g. Aug 31 → Jun 30. Books published on or after the
+    returned instant are kept.
+    """
+    month = now.month - _RECENCY_MONTHS
+    year = now.year
+    if month <= 0:
+        month += 12
+        year -= 1
+    day = min(now.day, calendar.monthrange(year, month)[1])
+    return datetime(year, month, day, tzinfo=UTC)
 
 
 def _clean(value: object) -> str | None:
@@ -82,16 +106,17 @@ class GoogleBooksExtractor:
         if not isinstance(items, list):
             raise ParseError(f"Expected an 'items' array from Google Books API: {cfg.url}")
 
-        posts = [post for item in items if isinstance(item, dict) if (post := self._to_post(item)) is not None]
+        cutoff = _min_published(_now())
+        posts = [post for item in items if isinstance(item, dict) if (post := self._to_post(item, cutoff)) is not None]
         logger.info("google_books.fetched", feed=cfg.id, count=len(posts))
         return posts
 
-    def _to_post(self, item: dict[str, Any]) -> Post | None:
+    def _to_post(self, item: dict[str, Any], cutoff: datetime) -> Post | None:
         """Map one volume to a Post, or None to skip it.
 
-        Volumes are skipped (not errors) when they are non-English or lack a
-        usable publication date — both are expected in search results and have
-        no place in a date-ordered, English-only feed.
+        Volumes are skipped (not errors) when they are non-English, lack a usable
+        publication date, or were published before ``cutoff`` — all are expected in
+        search results and have no place in a recent, English-only feed.
         """
         vi = item.get("volumeInfo")
         if not isinstance(vi, dict):
@@ -102,7 +127,7 @@ class GoogleBooksExtractor:
             return None
 
         published = self._parse_date(vi.get("publishedDate"))
-        if published is None:
+        if published is None or published < cutoff:
             return None
 
         volume_id = item.get("id")

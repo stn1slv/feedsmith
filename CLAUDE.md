@@ -74,8 +74,10 @@ Five extractors exist. Four fetch **structured data**; one scrapes rendered HTML
   no-auth Google Books volumes API. The category (`subject:Computers`) and `langRestrict=en`
   are fixed in the extractor; the search term comes from `FeedConfig.query`, so adding a query
   is a `feeds.yaml`-only change. `publishedDate` has variable precision (`2024`, `2024-03`,
-  `2024-03-15`) — padded to day 1 and stamped UTC; volumes with no usable date or a non-`en`
-  language are skipped. An optional API key (raises the anonymous quota / avoids `429`) is read
+  `2024-03-15`) — padded to day 1 and stamped UTC; volumes with no usable date, a non-`en`
+  language, or a publish date older than the rolling recency cutoff (`_RECENCY_MONTHS`, default
+  2 calendar months before run time; `_now()` is the test seam) are skipped.
+  An optional API key (raises the anonymous quota / avoids `429`) is read
   from the `GOOGLE_BOOKS_API_KEY` env var and appended as `key`; it is never put in `feeds.yaml`
   (which ships in the wheel) or logged.
 

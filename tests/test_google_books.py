@@ -2,14 +2,24 @@
 
 from __future__ import annotations
 
-from datetime import UTC
+from datetime import UTC, datetime
 
 import httpx
 import pytest
 import respx
 
 from feedsmith.exceptions import ConfigError, FetchError, ParseError
-from feedsmith.extractors.google_books import GoogleBooksExtractor
+from feedsmith.extractors.google_books import GoogleBooksExtractor, _min_published
+
+
+@pytest.fixture(autouse=True)
+def _frozen_now(monkeypatch):
+    # Freeze the clock so the rolling recency cutoff is deterministic. With "now"
+    # at 2026-07-01, the two-month cutoff is 2026-05-01 (matches the fixture dates).
+    monkeypatch.setattr(
+        "feedsmith.extractors.google_books._now",
+        lambda: datetime(2026, 7, 1, tzinfo=UTC),
+    )
 
 
 @respx.mock
@@ -17,8 +27,8 @@ def test_fetch_maps_posts(books_config, google_books_json, client):
     respx.get(books_config.url).mock(return_value=httpx.Response(200, text=google_books_json))
     posts = GoogleBooksExtractor().fetch(books_config, client)
 
-    # The German volume and the undated volume are skipped; 3 remain.
-    assert [p.id for p in posts] == ["fullDate001", "yearOnly002", "yearMonth003"]
+    # Skipped: the pre-cutoff (2026-04-15), German, and undated volumes; 3 remain.
+    assert [p.id for p in posts] == ["fullDate001", "yearMonth002", "yearOnly003"]
 
     # Volumes come back in source order; the service layer sorts by published desc.
     first = posts[0]
@@ -28,8 +38,8 @@ def test_fetch_maps_posts(books_config, google_books_json, client):
     assert first.categories == ["Computers"]
     # clean_text strips the <b> tag from the description.
     assert first.summary == "A hands-on guide to building integrations on the Anypoint Platform."
-    assert first.published.year == 2025
-    assert first.published.month == 3
+    assert first.published.year == 2026
+    assert first.published.month == 5
     assert first.published.day == 12
     assert first.published.tzinfo == UTC
 
@@ -40,11 +50,11 @@ def test_partial_dates_are_padded(books_config, google_books_json, client):
     posts = GoogleBooksExtractor().fetch(books_config, client)
     by_id = {p.id: p for p in posts}
 
-    # "2024" -> 2024-01-01; "2023-09" -> 2023-09-01.
-    assert (by_id["yearOnly002"].published.year, by_id["yearOnly002"].published.month) == (2024, 1)
-    assert (by_id["yearMonth003"].published.year, by_id["yearMonth003"].published.month) == (2023, 9)
+    # "2026-06" -> 2026-06-01; "2027" -> 2027-01-01.
+    assert (by_id["yearMonth002"].published.year, by_id["yearMonth002"].published.month) == (2026, 6)
+    assert (by_id["yearOnly003"].published.year, by_id["yearOnly003"].published.month) == (2027, 1)
     # No canonicalVolumeLink -> falls back to infoLink.
-    assert by_id["yearOnly002"].url == "https://books.google.com/books?id=yearOnly002"
+    assert by_id["yearMonth002"].url == "https://books.google.com/books?id=yearMonth002"
 
 
 @respx.mock
@@ -57,7 +67,7 @@ def test_non_string_text_fields_are_tolerated(books_config, client):
                 "id": "junk001",
                 "volumeInfo": {
                     "title": "Resilient Book",
-                    "publishedDate": "2025-02-01",
+                    "publishedDate": "2026-05-15",
                     "language": "en",
                     "authors": ["Real Author", 42, None],
                     "categories": ["Computers", 7, None],
@@ -74,6 +84,48 @@ def test_non_string_text_fields_are_tolerated(books_config, client):
     assert posts[0].author == "Real Author"  # non-string entries dropped
     assert posts[0].categories == ["Computers"]  # non-string entries dropped
     assert posts[0].summary is None  # non-string description ignored
+
+
+@pytest.mark.parametrize(
+    ("now", "expected"),
+    [
+        (datetime(2026, 7, 1, tzinfo=UTC), datetime(2026, 5, 1, tzinfo=UTC)),
+        (datetime(2026, 1, 15, tzinfo=UTC), datetime(2025, 11, 15, tzinfo=UTC)),  # year wrap
+        (datetime(2026, 8, 31, tzinfo=UTC), datetime(2026, 6, 30, tzinfo=UTC)),  # day clamp
+    ],
+)
+def test_min_published_is_two_months_before(now, expected):
+    assert _min_published(now) == expected
+
+
+@respx.mock
+def test_books_before_cutoff_are_excluded(books_config, client):
+    # The cutoff is inclusive: 2026-05-01 is kept; the day before is dropped.
+    payload = {
+        "items": [
+            {
+                "id": "kept",
+                "volumeInfo": {
+                    "title": "On the Cutoff",
+                    "publishedDate": "2026-05-01",
+                    "language": "en",
+                    "canonicalVolumeLink": "https://books.google.com/books?id=kept",
+                },
+            },
+            {
+                "id": "dropped",
+                "volumeInfo": {
+                    "title": "Day Before the Cutoff",
+                    "publishedDate": "2026-04-30",
+                    "language": "en",
+                    "canonicalVolumeLink": "https://books.google.com/books?id=dropped",
+                },
+            },
+        ]
+    }
+    respx.get(books_config.url).mock(return_value=httpx.Response(200, json=payload))
+    posts = GoogleBooksExtractor().fetch(books_config, client)
+    assert [p.id for p in posts] == ["kept"]
 
 
 @respx.mock
