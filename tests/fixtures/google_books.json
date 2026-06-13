@@ -1,0 +1,71 @@
+{
+    "kind": "books#volumes",
+    "totalItems": 6,
+    "items": [
+        {
+            "kind": "books#volume",
+            "id": "fullDate001",
+            "volumeInfo": {
+                "title": "Mastering MuleSoft",
+                "subtitle": "Anypoint Platform in Practice",
+                "authors": ["Jane Integrator", "Sam Connector"],
+                "publishedDate": "2026-05-12",
+                "description": "A <b>hands-on</b> guide to building integrations on the Anypoint Platform.",
+                "categories": ["Computers"],
+                "language": "en",
+                "canonicalVolumeLink": "https://books.google.com/books/about/Mastering_MuleSoft.html?id=fullDate001",
+                "infoLink": "https://books.google.com/books?id=fullDate001&tracking=1"
+            }
+        },
+        {
+            "kind": "books#volume",
+            "id": "yearMonth002",
+            "volumeInfo": {
+                "title": "MuleSoft Cookbook",
+                "authors": ["Ada Flow"],
+                "publishedDate": "2026-06",
+                "language": "en",
+                "infoLink": "https://books.google.com/books?id=yearMonth002"
+            }
+        },
+        {
+            "kind": "books#volume",
+            "id": "yearOnly003",
+            "volumeInfo": {
+                "title": "Integration Patterns with MuleSoft",
+                "publishedDate": "2027",
+                "language": "en",
+                "canonicalVolumeLink": "https://books.google.com/books/about/Integration_Patterns.html?id=yearOnly003"
+            }
+        },
+        {
+            "kind": "books#volume",
+            "id": "oldBook004",
+            "volumeInfo": {
+                "title": "MuleSoft, the Early Years",
+                "publishedDate": "2026-04-15",
+                "language": "en",
+                "canonicalVolumeLink": "https://books.google.com/books?id=oldBook004"
+            }
+        },
+        {
+            "kind": "books#volume",
+            "id": "german005",
+            "volumeInfo": {
+                "title": "MuleSoft auf Deutsch",
+                "publishedDate": "2026-05-20",
+                "language": "de",
+                "canonicalVolumeLink": "https://books.google.com/books?id=german005"
+            }
+        },
+        {
+            "kind": "books#volume",
+            "id": "noDate006",
+            "volumeInfo": {
+                "title": "Undated MuleSoft Notes",
+                "language": "en",
+                "canonicalVolumeLink": "https://books.google.com/books?id=noDate006"
+            }
+        }
+    ]
+}

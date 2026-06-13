@@ -1,3 +1,3 @@
 """feedsmith: generate Atom feeds for blogs without an official feed."""
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
