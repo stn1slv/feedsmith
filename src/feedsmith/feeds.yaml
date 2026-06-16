@@ -38,6 +38,14 @@ feeds:
     query: "MuleSoft"
     max_items: 20
 
+  books-oreilly:
+    title: "Books: O'Reilly Media (Computers & Technology)"
+    extractor: google_books
+    url: "https://www.googleapis.com/books/v1/volumes"
+    site_url: 'https://books.google.com/books?q=inpublisher:"O''Reilly+Media"+subject:Computers'
+    query: 'inpublisher:"O''Reilly Media"'
+    max_items: 20
+
   books-integration:
     title: "Books: Integration (Computers & Technology)"
     extractor: google_books

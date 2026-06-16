@@ -26,6 +26,11 @@ the term. Only books published within the **last two months** are included, so t
 feeds stay fresh. Adding a new query is a `feeds.yaml`-only change: copy a `books-*`
 block and set its `id`, `title`, `query`, and `site_url`.
 
+One feed, `books-oreilly`, filters by **publisher** instead of a topic term
+(`query: inpublisher:"O'Reilly Media"`), so it lists recent O'Reilly Media titles in the same
+category. O'Reilly publishes no public, no-key book catalog of its own, so its books are sourced
+through Google Books like every other `books-*` feed.
+
 ### Optional: Google Books API key
 
 The Google Books API works **without** credentials, but anonymous requests share a

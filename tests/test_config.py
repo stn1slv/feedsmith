@@ -25,6 +25,7 @@ def test_load_default_config_has_expected_feeds():
         "books-kong",
         "books-mcp",
         "books-mulesoft",
+        "books-oreilly",
         "books-tibco",
         "books-webmethods",
         "boomi",
