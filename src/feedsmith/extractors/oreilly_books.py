@@ -140,9 +140,10 @@ class OreillyBooksExtractor:
 
     @staticmethod
     def _parse_datetime(value: object) -> datetime | None:
-        # date_added is ISO 8601 with a trailing "Z" and fractional seconds
-        # (e.g. "2026-06-16T21:35:21.108Z"); fromisoformat handles both on 3.13.
-        # A value without an offset is stamped UTC to satisfy the Post validator.
+        # Both issued and date_added are ISO 8601, optionally with a trailing "Z"
+        # and fractional seconds (e.g. "2026-06-16T21:35:21.108Z"); fromisoformat
+        # handles these on 3.13. A value without an offset is stamped UTC to satisfy
+        # the Post validator.
         if not isinstance(value, str) or not value:
             return None
         try:
