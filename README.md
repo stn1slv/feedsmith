@@ -27,10 +27,12 @@ the term. Only books published within the **last two months** are included, so t
 feeds stay fresh. Adding a new query is a `feeds.yaml`-only change: copy a `books-*`
 block and set its `id`, `title`, `query`, and `site_url`.
 
-The `oreilly_books` extractor backs the `oreilly` feed: the newest **O'Reilly Media** books read
-straight from O'Reilly's own public search API (no account or key), filtered to the O'Reilly Media
-publisher and ordered by catalog-add date. This is a direct, structured-data source, so O'Reilly
-books are no longer sourced through Google Books.
+The `oreilly_books` extractor backs the `oreilly` feed: **O'Reilly Media** books read straight from
+O'Reilly's own public search API (no account or key), filtered to the O'Reilly Media publisher.
+Not-yet-released titles (publication date next calendar month or later) are excluded, and the
+remaining books are ordered by publication date. Each entry's Atom `<published>` is the book's
+release date and `<updated>` is the date it was added to O'Reilly's catalog. This is a direct,
+structured-data source, so O'Reilly books are no longer sourced through Google Books.
 
 ### Optional: Google Books API key
 

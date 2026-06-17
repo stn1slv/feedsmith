@@ -14,15 +14,19 @@ class Post(BaseModel):
     title: str
     url: str = Field(..., description="Canonical link to the post.")
     published: datetime = Field(..., description="Timezone-aware publication timestamp.")
+    updated: datetime | None = Field(
+        default=None,
+        description="Timezone-aware last-updated timestamp; falls back to published when absent.",
+    )
     summary: str | None = None
     author: str | None = None
     categories: list[str] = Field(default_factory=list)
 
-    @field_validator("published")
+    @field_validator("published", "updated")
     @classmethod
-    def _require_timezone(cls, value: datetime) -> datetime:
-        if value.tzinfo is None:
-            raise ValueError("published must be timezone-aware")
+    def _require_timezone(cls, value: datetime | None) -> datetime | None:
+        if value is not None and value.tzinfo is None:
+            raise ValueError("timestamp must be timezone-aware")
         return value
 
 
