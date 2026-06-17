@@ -83,12 +83,17 @@ Six extractors exist. Five fetch **structured data**; one scrapes rendered HTML:
 - `oreilly_books` (`extractors/oreilly_books.py`): backs the `oreilly` feed — the newest
   **O'Reilly Media** books read straight from O'Reilly's own public, no-auth search API
   (`https://www.oreilly.com/api/v2/search/`). The publisher (`O'Reilly Media, Inc.`) and
-  `formats=book` are fixed in the extractor and results are sorted `date_added` desc, so no
-  query, key, or recency filter is needed (the service layer takes the newest `max_items`).
-  `Post.published` is the `date_added` timestamp (ISO 8601, parsed via `datetime.fromisoformat`,
-  stamped UTC if naive); the human link is `https://www.oreilly.com` + the result's relative
-  `web_url`. Results that are not `format=book`, are non-`en`, or lack a usable id/title/link/date
-  are skipped. This is the direct, structured-data source for O'Reilly books (it replaced an
+  `formats=book` are fixed in the extractor; the API is queried `sort=date_added` desc, so no
+  query or key is needed. `Post.published` is the book's real publication date (`issued`) and
+  `Post.updated` is the `date_added` catalog-add date (both ISO 8601, parsed via
+  `datetime.fromisoformat`, stamped UTC if naive). Because the service layer sorts by
+  `Post.published`, the feed is ordered by release date desc and truncated to `max_items`.
+  The human link is `https://www.oreilly.com` + the result's relative `web_url`. A release-date
+  filter excludes not-yet-released titles: results whose `issued` falls in the next calendar
+  month or later are skipped (cutoff is the first instant of next month via `_max_issued`;
+  `_now()` is the test seam), as are results lacking a usable `issued`. Results that are not
+  `format=book`, are non-`en`, or lack a usable id/title/link/`issued`/`date_added` are also
+  skipped. This is the direct, structured-data source for O'Reilly books (it replaced an
   earlier Google Books `books-oreilly` config feed).
 
 `extractors/base.py` also provides `clean_text()` — a deliberately narrow regex tag-stripper

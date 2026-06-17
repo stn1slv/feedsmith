@@ -27,7 +27,7 @@ def build_atom(meta: FeedMeta, posts: list[Post]) -> str:
     if meta.self_url:
         fg.link(href=meta.self_url, rel="self")
 
-    last_updated = max((p.published for p in posts), default=datetime.now(UTC))
+    last_updated = max((p.updated or p.published for p in posts), default=datetime.now(UTC))
     fg.updated(last_updated)
 
     # feedgen prepends entries, so add oldest first to keep newest at the top.
@@ -37,7 +37,7 @@ def build_atom(meta: FeedMeta, posts: list[Post]) -> str:
         entry.title(post.title)
         entry.link(href=post.url, rel="alternate")
         entry.published(post.published)
-        entry.updated(post.published)
+        entry.updated(post.updated or post.published)
         if post.summary:
             entry.summary(post.summary)
         if post.author:
