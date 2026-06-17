@@ -14,6 +14,7 @@ builder serializes the posts to Atom 1.0.
 | `kong`  | https://konghq.com/blog/ | `nextjs_blog` | Embedded `__NEXT_DATA__` JSON |
 | `bump`  | https://bump.sh/blog/ | `bump_blog` | Rendered HTML cards (BeautifulSoup) |
 | `treblle` | https://treblle.com/blog/ | `sanity_blog` | Public Sanity CMS (GROQ query API) |
+| `oreilly` | https://www.oreilly.com/ | `oreilly_books` | O'Reilly search API (public JSON, newest O'Reilly Media books) |
 | `books-*` | https://books.google.com/ | `google_books` | Google Books API (English Computers & Technology books) |
 
 The `wordpress_api` extractor is generic: adding another WordPress blog is a
@@ -25,6 +26,11 @@ recent **English** books in the **Computers & Technology** category that match
 the term. Only books published within the **last two months** are included, so the
 feeds stay fresh. Adding a new query is a `feeds.yaml`-only change: copy a `books-*`
 block and set its `id`, `title`, `query`, and `site_url`.
+
+The `oreilly_books` extractor backs the `oreilly` feed: the newest **O'Reilly Media** books read
+straight from O'Reilly's own public search API (no account or key), filtered to the O'Reilly Media
+publisher and ordered by catalog-add date. This is a direct, structured-data source, so O'Reilly
+books are no longer sourced through Google Books.
 
 ### Optional: Google Books API key
 

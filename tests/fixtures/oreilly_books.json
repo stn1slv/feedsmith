@@ -1,0 +1,70 @@
+{
+  "results": [
+    {
+      "ourn": "urn:orm:book:9781111111111",
+      "archive_id": "9781111111111",
+      "isbn": "9781111111112",
+      "format": "book",
+      "language": "en",
+      "title": "Mastering Event-Driven Systems",
+      "authors": ["Ada Stream", "Linus Queue"],
+      "publishers": ["O'Reilly Media, Inc."],
+      "date_added": "2026-06-16T21:35:21.108Z",
+      "issued": "2026-08-25T00:00:00Z",
+      "web_url": "/library/view/mastering-event-driven/9781111111111/",
+      "topics": ["b0abd4e1-5a93-4a0c-bc16-484862521b91"],
+      "description": "<span><div><p>A <b>practical</b> guide to building event-driven systems.</p></div></span>"
+    },
+    {
+      "ourn": "urn:orm:book:9782222222222",
+      "archive_id": "9782222222222",
+      "isbn": "9782222222223",
+      "format": "book",
+      "language": "en",
+      "title": "Hands-On API Governance",
+      "authors": ["Grace Gateway"],
+      "publishers": ["O'Reilly Media, Inc."],
+      "date_added": "2026-06-10T08:00:00Z",
+      "issued": "2026-06-01T00:00:00Z",
+      "web_url": "/library/view/hands-on-api-governance/9782222222222/",
+      "description": "An approachable look at API governance."
+    },
+    {
+      "ourn": "urn:orm:book:9783333333333",
+      "archive_id": "9783333333333",
+      "format": "book",
+      "language": "de",
+      "title": "Verteilte Systeme",
+      "authors": ["Hans Muster"],
+      "publishers": ["O'Reilly Media, Inc."],
+      "date_added": "2026-06-09T08:00:00Z",
+      "web_url": "/library/view/verteilte-systeme/9783333333333/",
+      "description": "Ein deutsches Buch."
+    },
+    {
+      "ourn": "urn:orm:book:9784444444444",
+      "archive_id": "9784444444444",
+      "format": "book",
+      "language": "en",
+      "title": "Undated Title",
+      "authors": ["No Date"],
+      "publishers": ["O'Reilly Media, Inc."],
+      "web_url": "/library/view/undated-title/9784444444444/",
+      "description": "Missing date_added, so skipped."
+    },
+    {
+      "ourn": "urn:orm:video:9785555555555",
+      "archive_id": "9785555555555",
+      "format": "video",
+      "language": "en",
+      "title": "A Video Course",
+      "authors": ["Vid Eo"],
+      "publishers": ["O'Reilly Media, Inc."],
+      "date_added": "2026-06-08T08:00:00Z",
+      "web_url": "/library/view/a-video-course/9785555555555/",
+      "description": "Not a book."
+    }
+  ],
+  "total": 4161,
+  "page": 0
+}

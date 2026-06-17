@@ -27,6 +27,14 @@ feeds:
     site_url: "https://treblle.com/blog/"
     max_items: 20
 
+  # Newest O'Reilly Media books from O'Reilly's own public, no-auth search API.
+  oreilly:
+    title: "O'Reilly Media Books"
+    extractor: oreilly_books
+    url: "https://www.oreilly.com/api/v2/search/"
+    site_url: "https://www.oreilly.com/products/new-upcoming.html"
+    max_items: 100
+
   # Computers & Technology books (English) from the Google Books API. Adding a new
   # query is a feeds.yaml-only change: copy a block and change the id, title, query,
   # and site_url. Multi-word terms are quoted to force phrase matching.

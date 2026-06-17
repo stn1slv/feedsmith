@@ -30,6 +30,7 @@ def test_load_default_config_has_expected_feeds():
         "boomi",
         "bump",
         "kong",
+        "oreilly",
         "treblle",
     ]
     boomi = config.get("boomi")
