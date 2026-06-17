@@ -52,8 +52,9 @@ def test_limit_scales_with_max_items_and_is_capped(oreilly_config, oreilly_books
     OreillyBooksExtractor().fetch(oreilly_config.model_copy(update={"max_items": 100}), client)
     assert route.calls.last.request.url.params["limit"] == "110"
 
-    # Capped at the API's 200-result ceiling.
-    OreillyBooksExtractor().fetch(oreilly_config.model_copy(update={"max_items": 500}), client)
+    # At the config-allowed maximum (max_items le=200), the buffer would exceed the
+    # API's 200-result ceiling, so the request limit clamps back to 200.
+    OreillyBooksExtractor().fetch(oreilly_config.model_copy(update={"max_items": 200}), client)
     assert route.calls.last.request.url.params["limit"] == "200"
 
 
