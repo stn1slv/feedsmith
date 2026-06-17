@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from typing import Any
+from urllib.parse import urljoin
 
 import httpx
 
@@ -103,7 +104,7 @@ class OreillyBooksExtractor:
         return Post(
             id=str(book_id),
             title=title,
-            url=f"{_WEB_BASE}{web_url}",
+            url=urljoin(_WEB_BASE, web_url),
             published=published,
             summary=_clean(item.get("description")),
             author=", ".join(names) or None,
