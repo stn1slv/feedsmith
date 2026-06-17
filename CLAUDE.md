@@ -56,7 +56,7 @@ Extractors are strategies implementing the `Extractor` protocol (`extractors/bas
 `fetch(cfg: FeedConfig, client: httpx.Client) -> list[Post]`. They must **not** sort or
 truncate — the service layer does that. They map source data to the normalized `Post` model.
 
-Five extractors exist. Four fetch **structured data**; one scrapes rendered HTML:
+Six extractors exist. Five fetch **structured data**; one scrapes rendered HTML:
 - `wordpress_api` (`extractors/wordpress_api.py`): WordPress REST API (`wp-json/wp/v2/posts`).
   Generic — adding another WordPress blog is a `feeds.yaml`-only change.
 - `nextjs_blog` (`extractors/nextjs_blog.py`): pulls the `__NEXT_DATA__` JSON blob out of the
@@ -80,6 +80,16 @@ Five extractors exist. Four fetch **structured data**; one scrapes rendered HTML
   An optional API key (raises the anonymous quota / avoids `429`) is read
   from the `GOOGLE_BOOKS_API_KEY` env var and appended as `key`; it is never put in `feeds.yaml`
   (which ships in the wheel) or logged.
+- `oreilly_books` (`extractors/oreilly_books.py`): backs the `oreilly` feed — the newest
+  **O'Reilly Media** books read straight from O'Reilly's own public, no-auth search API
+  (`https://www.oreilly.com/api/v2/search/`). The publisher (`O'Reilly Media, Inc.`) and
+  `formats=book` are fixed in the extractor and results are sorted `date_added` desc, so no
+  query, key, or recency filter is needed (the service layer takes the newest `max_items`).
+  `Post.published` is the `date_added` timestamp (ISO 8601, parsed via `datetime.fromisoformat`,
+  stamped UTC if naive); the human link is `https://www.oreilly.com` + the result's relative
+  `web_url`. Results that are not `format=book`, are non-`en`, or lack a usable id/title/link/date
+  are skipped. This is the direct, structured-data source for O'Reilly books (it replaced an
+  earlier Google Books `books-oreilly` config feed).
 
 `extractors/base.py` also provides `clean_text()` — a deliberately narrow regex tag-stripper
 for short title/excerpt snippets. It is **not** an HTML parser. The one real HTML parser
@@ -106,7 +116,7 @@ Custom hierarchy in `exceptions.py`: `FeedsmithError` (base) → `ConfigError`, 
 
 - **Tests never hit the network.** Extractor/service/CLI tests mock httpx with `respx` and feed
   recorded responses from `tests/fixtures/` (`boomi_posts.json`, `kong_blog.html`, `bump_blog.html`,
-  `treblle_blog.json`, `google_books.json`). Keep it that way.
+  `treblle_blog.json`, `google_books.json`, `oreilly_books.json`). Keep it that way.
 - `Post.published` must be **timezone-aware** (a validator enforces this). WordPress `date_gmt`
   is UTC-without-offset and is stamped UTC; Next.js `publishedAt` carries a `Z`.
 - structlog logging is configured with `cache_logger_on_first_use=False` on purpose, so the

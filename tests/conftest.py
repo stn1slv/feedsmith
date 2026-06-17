@@ -48,6 +48,11 @@ def google_books_json() -> str:
 
 
 @pytest.fixture
+def oreilly_books_json() -> str:
+    return (FIXTURES / "oreilly_books.json").read_text(encoding="utf-8")
+
+
+@pytest.fixture
 def boomi_config() -> FeedConfig:
     return FeedConfig(
         id="boomi",
@@ -104,6 +109,18 @@ def books_config() -> FeedConfig:
         url="https://www.googleapis.com/books/v1/volumes",
         site_url="https://books.google.com/books?q=MuleSoft+subject:Computers",
         query="MuleSoft",
+        max_items=20,
+    )
+
+
+@pytest.fixture
+def oreilly_config() -> FeedConfig:
+    return FeedConfig(
+        id="oreilly",
+        title="O'Reilly Media Books",
+        extractor="oreilly_books",
+        url="https://www.oreilly.com/api/v2/search/",
+        site_url="https://www.oreilly.com/products/new-upcoming.html",
         max_items=20,
     )
 

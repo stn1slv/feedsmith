@@ -55,11 +55,13 @@ def test_generate_all(
     kong_config,
     bump_config,
     treblle_config,
+    oreilly_config,
     books_config,
     boomi_json,
     kong_html,
     bump_html,
     treblle_json,
+    oreilly_books_json,
     google_books_json,
     tmp_path: Path,
 ):
@@ -67,6 +69,7 @@ def test_generate_all(
     respx.get(kong_config.url).mock(return_value=httpx.Response(200, text=kong_html))
     respx.get(bump_config.url).mock(return_value=httpx.Response(200, text=bump_html))
     respx.get(treblle_config.url).mock(return_value=httpx.Response(200, text=treblle_json))
+    respx.get(oreilly_config.url).mock(return_value=httpx.Response(200, text=oreilly_books_json))
     # All books-* feeds share the Google Books URL; one mock covers them.
     respx.get(books_config.url).mock(return_value=httpx.Response(200, text=google_books_json))
     out_dir = tmp_path / "out"
@@ -76,4 +79,5 @@ def test_generate_all(
     assert (out_dir / "kong.xml").exists()
     assert (out_dir / "bump.xml").exists()
     assert (out_dir / "treblle.xml").exists()
+    assert (out_dir / "oreilly.xml").exists()
     assert (out_dir / "books-mulesoft.xml").exists()
