@@ -1,6 +1,6 @@
 [project]
 name = "feedsmith"
-version = "0.5.1"
+version = "0.5.2"
 description = "Generate Atom feeds for blogs that publish no official feed."
 readme = "README.md"
 license = { text = "MIT" }

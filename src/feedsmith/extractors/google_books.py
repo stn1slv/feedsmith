@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import calendar
 import os
+import time
 from datetime import UTC, datetime
 from typing import Any
 
@@ -40,10 +41,18 @@ _RECENCY_MONTHS = 2
 # (which ships inside the wheel) and never logged.
 _API_KEY_ENV = "GOOGLE_BOOKS_API_KEY"
 
+_RETRY_STATUS_CODES = {429, 500, 502, 503, 504}
+_MAX_ATTEMPTS = 3
+
 
 def _now() -> datetime:
     """Current UTC time. A seam so the recency cutoff can be frozen in tests."""
     return datetime.now(UTC)
+
+
+def _sleep(seconds: float) -> None:
+    """Sleep seam so retries can run instantly in tests."""
+    time.sleep(seconds)
 
 
 def _min_published(now: datetime) -> datetime:
@@ -64,6 +73,42 @@ def _min_published(now: datetime) -> datetime:
 def _clean(value: object) -> str | None:
     """Clean a text field, tolerating non-string JSON values by ignoring them."""
     return clean_text(value) if isinstance(value, str) else None
+
+
+def _get_with_retries(
+    client: httpx.Client,
+    url: str,
+    params: dict[str, str | int],
+    max_attempts: int = _MAX_ATTEMPTS,
+) -> httpx.Response:
+    last_err: httpx.HTTPError | None = None
+    for attempt in range(max_attempts):
+        try:
+            response = client.get(url, params=params)
+            if response.status_code in _RETRY_STATUS_CODES:
+                response.raise_for_status()
+            response.raise_for_status()
+            return response
+        except httpx.HTTPStatusError as err:
+            last_err = err
+            if err.response.status_code not in _RETRY_STATUS_CODES or attempt == max_attempts - 1:
+                raise
+            logger.debug(
+                "google_books.retry",
+                url=url,
+                attempt=attempt + 1,
+                status=err.response.status_code,
+            )
+            _sleep(0.5 * (2**attempt))
+        except httpx.HTTPError as err:
+            last_err = err
+            if attempt == max_attempts - 1:
+                raise
+            logger.debug("google_books.retry", url=url, attempt=attempt + 1, error=str(err))
+            _sleep(0.5 * (2**attempt))
+    if last_err is not None:
+        raise last_err
+    raise RuntimeError("Unreachable: max_attempts must be >= 1")
 
 
 class GoogleBooksExtractor:
@@ -90,8 +135,11 @@ class GoogleBooksExtractor:
         if api_key:
             params["key"] = api_key
         try:
-            response = client.get(cfg.url, params=params)
-            response.raise_for_status()
+            response = _get_with_retries(client, cfg.url, params)
+        except httpx.HTTPStatusError as err:
+            raise FetchError(
+                f"Failed to query Google Books API at {cfg.url} (HTTP {err.response.status_code})"
+            ) from err
         except httpx.HTTPError as err:
             raise FetchError(f"Failed to query Google Books API at {cfg.url}") from err
 
