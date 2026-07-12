@@ -9,7 +9,7 @@ import pytest
 import respx
 
 from feedsmith.config import AppConfig
-from feedsmith.exceptions import FetchError
+from feedsmith.exceptions import ConfigError, FetchError
 from feedsmith.service import generate_all, generate_feed
 
 ATOM = "{http://www.w3.org/2005/Atom}"
@@ -55,3 +55,10 @@ def test_generate_feed_raises_on_fetch_error(boomi_config, client):
     respx.get(boomi_config.url).mock(return_value=httpx.Response(500))
     with pytest.raises(FetchError):
         generate_feed(boomi_config, client)
+
+
+def test_generate_all_raises_on_config_error(books_config, client):
+    bad_books = books_config.model_copy(update={"query": None})
+    config = AppConfig(feeds={"books": bad_books})
+    with pytest.raises(ConfigError):
+        generate_all(config, client)

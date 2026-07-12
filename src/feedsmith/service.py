@@ -9,7 +9,7 @@ from __future__ import annotations
 import httpx
 
 from feedsmith.config import AppConfig, FeedConfig
-from feedsmith.exceptions import FeedsmithError
+from feedsmith.exceptions import FetchError, ParseError
 from feedsmith.extractors.registry import get_extractor
 from feedsmith.feed import build_atom
 from feedsmith.logging import get_logger
@@ -45,7 +45,7 @@ def generate_all(config: AppConfig, client: httpx.Client) -> dict[str, str]:
         cfg = config.feeds[feed_id]
         try:
             feeds[feed_id] = generate_feed(cfg, client)
-        except FeedsmithError as err:
+        except (FetchError, ParseError) as err:
             logger.warning(
                 "feed.skipped",
                 feed=feed_id,
