@@ -5,6 +5,7 @@ from __future__ import annotations
 import xml.etree.ElementTree as ET
 
 import httpx
+import pytest
 import respx
 
 from feedsmith.config import AppConfig
@@ -40,7 +41,7 @@ def test_generate_all_returns_feed_per_config(boomi_config, kong_config, boomi_j
 
 
 @respx.mock
-def test_generate_all_skips_google_books_error_and_continues(books_config, boomi_config, boomi_json, client):
+def test_generate_all_skips_failed_feed_and_continues(books_config, boomi_config, boomi_json, client):
     respx.get(books_config.url).mock(return_value=httpx.Response(503))
     respx.get(boomi_config.url).mock(return_value=httpx.Response(200, text=boomi_json))
     config = AppConfig(feeds={"books": books_config, "boomi": boomi_config})
@@ -50,11 +51,7 @@ def test_generate_all_skips_google_books_error_and_continues(books_config, boomi
 
 
 @respx.mock
-def test_generate_all_raises_on_non_google_books_error(boomi_config, client):
+def test_generate_feed_raises_on_fetch_error(boomi_config, client):
     respx.get(boomi_config.url).mock(return_value=httpx.Response(500))
-    config = AppConfig(feeds={"boomi": boomi_config})
-
-    import pytest
-
     with pytest.raises(FetchError):
-        generate_all(config, client)
+        generate_feed(boomi_config, client)

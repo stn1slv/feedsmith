@@ -81,16 +81,12 @@ def _get_with_retries(
     params: dict[str, str | int],
     max_attempts: int = _MAX_ATTEMPTS,
 ) -> httpx.Response:
-    last_err: httpx.HTTPError | None = None
     for attempt in range(max_attempts):
         try:
             response = client.get(url, params=params)
-            if response.status_code in _RETRY_STATUS_CODES:
-                response.raise_for_status()
             response.raise_for_status()
             return response
         except httpx.HTTPStatusError as err:
-            last_err = err
             if err.response.status_code not in _RETRY_STATUS_CODES or attempt == max_attempts - 1:
                 raise
             logger.debug(
@@ -101,13 +97,10 @@ def _get_with_retries(
             )
             _sleep(0.5 * (2**attempt))
         except httpx.HTTPError as err:
-            last_err = err
             if attempt == max_attempts - 1:
                 raise
             logger.debug("google_books.retry", url=url, attempt=attempt + 1, error=str(err))
             _sleep(0.5 * (2**attempt))
-    if last_err is not None:
-        raise last_err
     raise RuntimeError("Unreachable: max_attempts must be >= 1")
 
 

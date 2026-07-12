@@ -248,6 +248,34 @@ def test_transient_error_retries_and_succeeds(books_config, google_books_json, c
 
 
 @respx.mock
+def test_transport_error_retries_and_succeeds(books_config, google_books_json, client):
+    route = respx.get(books_config.url).mock(
+        side_effect=[
+            httpx.ConnectError("boom"),
+            httpx.Response(200, text=google_books_json),
+        ]
+    )
+    posts = GoogleBooksExtractor().fetch(books_config, client)
+    assert len(posts) == 3
+    assert route.call_count == 2
+
+
+@respx.mock
+def test_transport_error_exhausts_retries_raises_fetch_error(books_config, client):
+    respx.get(books_config.url).mock(side_effect=httpx.ConnectError("boom"))
+    with pytest.raises(FetchError):
+        GoogleBooksExtractor().fetch(books_config, client)
+
+
+@respx.mock
+def test_non_retryable_status_code_fails_immediately(books_config, client):
+    route = respx.get(books_config.url).mock(return_value=httpx.Response(404))
+    with pytest.raises(FetchError, match="HTTP 404"):
+        GoogleBooksExtractor().fetch(books_config, client)
+    assert route.call_count == 1
+
+
+@respx.mock
 def test_non_json_raises_parse_error(books_config, client):
     respx.get(books_config.url).mock(return_value=httpx.Response(200, text="<html>nope"))
     with pytest.raises(ParseError):

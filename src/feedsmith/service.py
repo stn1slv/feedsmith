@@ -37,7 +37,7 @@ def generate_feed(cfg: FeedConfig, client: httpx.Client) -> str:
 def generate_all(config: AppConfig, client: httpx.Client) -> dict[str, str]:
     """Generate feeds for every configured blog.
 
-    Returns a mapping of feed id to Atom XML. If a google_books feed fails,
+    Returns a mapping of feed id to Atom XML. If any feed fails to generate,
     logs a warning and skips it so other sources still proceed.
     """
     feeds: dict[str, str] = {}
@@ -46,15 +46,13 @@ def generate_all(config: AppConfig, client: httpx.Client) -> dict[str, str]:
         try:
             feeds[feed_id] = generate_feed(cfg, client)
         except FeedsmithError as err:
-            if cfg.extractor == "google_books":
-                logger.warning(
-                    "feed.skipped",
-                    feed=feed_id,
-                    extractor=cfg.extractor,
-                    error=str(err),
-                )
-                continue
-            raise
+            logger.warning(
+                "feed.skipped",
+                feed=feed_id,
+                extractor=cfg.extractor,
+                error=str(err),
+            )
+            continue
     return feeds
 
 
