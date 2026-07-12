@@ -22,6 +22,11 @@ def _frozen_now(monkeypatch):
     )
 
 
+@pytest.fixture(autouse=True)
+def _fast_sleep(monkeypatch):
+    monkeypatch.setattr("feedsmith.extractors.google_books._sleep", lambda _: None)
+
+
 @respx.mock
 def test_fetch_maps_posts(books_config, google_books_json, client):
     respx.get(books_config.url).mock(return_value=httpx.Response(200, text=google_books_json))
@@ -137,9 +142,7 @@ def test_requests_full_page_regardless_of_max_items(books_config, google_books_j
     # Request the full page (40) so client-side filters don't starve the feed;
     # the service layer truncates to max_items afterward.
     assert books_config.max_items == 20
-    route = respx.get(books_config.url).mock(
-        return_value=httpx.Response(200, text=google_books_json)
-    )
+    route = respx.get(books_config.url).mock(return_value=httpx.Response(200, text=google_books_json))
     GoogleBooksExtractor().fetch(books_config, client)
     assert route.calls.last.request.url.params["maxResults"] == "40"
 
@@ -226,8 +229,50 @@ def test_missing_query_raises_config_error(books_config, client):
 @respx.mock
 def test_http_error_raises_fetch_error(books_config, client):
     respx.get(books_config.url).mock(return_value=httpx.Response(503))
+    with pytest.raises(FetchError, match="HTTP 503"):
+        GoogleBooksExtractor().fetch(books_config, client)
+
+
+@respx.mock
+def test_transient_error_retries_and_succeeds(books_config, google_books_json, client):
+    route = respx.get(books_config.url).mock(
+        side_effect=[
+            httpx.Response(503),
+            httpx.Response(503),
+            httpx.Response(200, text=google_books_json),
+        ]
+    )
+    posts = GoogleBooksExtractor().fetch(books_config, client)
+    assert len(posts) == 3
+    assert route.call_count == 3
+
+
+@respx.mock
+def test_transport_error_retries_and_succeeds(books_config, google_books_json, client):
+    route = respx.get(books_config.url).mock(
+        side_effect=[
+            httpx.ConnectError("boom"),
+            httpx.Response(200, text=google_books_json),
+        ]
+    )
+    posts = GoogleBooksExtractor().fetch(books_config, client)
+    assert len(posts) == 3
+    assert route.call_count == 2
+
+
+@respx.mock
+def test_transport_error_exhausts_retries_raises_fetch_error(books_config, client):
+    respx.get(books_config.url).mock(side_effect=httpx.ConnectError("boom"))
     with pytest.raises(FetchError):
         GoogleBooksExtractor().fetch(books_config, client)
+
+
+@respx.mock
+def test_non_retryable_status_code_fails_immediately(books_config, client):
+    route = respx.get(books_config.url).mock(return_value=httpx.Response(404))
+    with pytest.raises(FetchError, match="HTTP 404"):
+        GoogleBooksExtractor().fetch(books_config, client)
+    assert route.call_count == 1
 
 
 @respx.mock
