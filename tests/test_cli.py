@@ -23,8 +23,21 @@ def test_version_flag():
 def test_list_command():
     result = runner.invoke(app, ["list"])
     assert result.exit_code == 0
+    assert "\t" not in result.stdout
     assert "boomi" in result.stdout
     assert "kong" in result.stdout
+    lines = result.stdout.strip().splitlines()
+    assert len(lines) > 0
+    # Check that lines contain padded spacing between id, title, and extractor
+    assert re.search(r"boomi\s+Boomi Blog\s+\(wordpress_api\)", result.stdout)
+
+
+def test_list_command_empty_config(tmp_path: Path):
+    empty_cfg = tmp_path / "empty.yaml"
+    empty_cfg.write_text("feeds: {}\n", encoding="utf-8")
+    result = runner.invoke(app, ["list", "--config", str(empty_cfg)])
+    assert result.exit_code == 0
+    assert result.stdout.strip() == ""
 
 
 @respx.mock

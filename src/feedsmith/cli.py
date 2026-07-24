@@ -60,9 +60,14 @@ def list_feeds(config: ConfigOption = None, verbose: VerboseOption = False) -> N
     configure_logging(level=logging.DEBUG if verbose else logging.INFO)
     with _handle_errors():
         app_config = load_config(config)
-        for feed_id in app_config.ids():
+        ids = list(app_config.ids())
+        if not ids:
+            return
+        max_id_len = max(len(fid) for fid in ids)
+        max_title_len = max(len(app_config.feeds[fid].title) for fid in ids)
+        for feed_id in ids:
             cfg = app_config.feeds[feed_id]
-            typer.echo(f"{feed_id}\t{cfg.title}\t({cfg.extractor})")
+            typer.echo(f"{feed_id:<{max_id_len}}  {cfg.title:<{max_title_len}}  ({cfg.extractor})")
 
 
 @app.command()
