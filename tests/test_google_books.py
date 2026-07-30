@@ -248,6 +248,21 @@ def test_transient_error_retries_and_succeeds(books_config, google_books_json, c
 
 
 @respx.mock
+def test_retry_sleep_delays(books_config, google_books_json, client, monkeypatch):
+    sleep_calls = []
+    monkeypatch.setattr("feedsmith.extractors.google_books._sleep", sleep_calls.append)
+    respx.get(books_config.url).mock(
+        side_effect=[
+            httpx.Response(503),
+            httpx.Response(503),
+            httpx.Response(200, text=google_books_json),
+        ]
+    )
+    GoogleBooksExtractor().fetch(books_config, client)
+    assert sleep_calls == [1.0, 2.0]
+
+
+@respx.mock
 def test_transport_error_retries_and_succeeds(books_config, google_books_json, client):
     route = respx.get(books_config.url).mock(
         side_effect=[

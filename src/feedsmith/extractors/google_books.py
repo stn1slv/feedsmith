@@ -42,7 +42,8 @@ _RECENCY_MONTHS = 2
 _API_KEY_ENV = "GOOGLE_BOOKS_API_KEY"
 
 _RETRY_STATUS_CODES = {429, 500, 502, 503, 504}
-_MAX_ATTEMPTS = 3
+_MAX_ATTEMPTS = 5
+_BASE_RETRY_DELAY_SECONDS = 1.0
 
 
 def _now() -> datetime:
@@ -80,6 +81,7 @@ def _get_with_retries(
     url: str,
     params: dict[str, str | int],
     max_attempts: int = _MAX_ATTEMPTS,
+    base_delay: float = _BASE_RETRY_DELAY_SECONDS,
 ) -> httpx.Response:
     for attempt in range(max_attempts):
         try:
@@ -95,12 +97,12 @@ def _get_with_retries(
                 attempt=attempt + 1,
                 status=err.response.status_code,
             )
-            _sleep(0.5 * (2**attempt))
+            _sleep(base_delay * (2**attempt))
         except httpx.HTTPError as err:
             if attempt == max_attempts - 1:
                 raise
             logger.debug("google_books.retry", url=url, attempt=attempt + 1, error=str(err))
-            _sleep(0.5 * (2**attempt))
+            _sleep(base_delay * (2**attempt))
     raise RuntimeError("Unreachable: max_attempts must be >= 1")
 
 
