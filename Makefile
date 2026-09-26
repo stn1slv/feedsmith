@@ -12,6 +12,7 @@ test: ## Run unit tests
 
 lint: ## Run linters and static analysis
 	uv run ruff check src tests
+	uv run ruff format --check src tests
 	uv run mypy src
 
 format: ## Auto-format code
