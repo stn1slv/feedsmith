@@ -1,4 +1,4 @@
-"""Extractor for blogs exposing the WordPress REST API (``wp-json/wp/v2/posts``)."""
+"""Extractor for blogs exposing the WordPress REST API (``wp-json/wp/v2/<post type>``)."""
 
 from __future__ import annotations
 

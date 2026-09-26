@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field, field_validator
 class Post(BaseModel):
     """A single blog post, normalized across all source types."""
 
-    id: str = Field(..., description="Stable unique identifier (used as the Atom entry id).")
+    id: str = Field(..., description="Stable unique identifier from the source.")
     title: str
     url: str = Field(..., description="Canonical link to the post.")
     published: datetime = Field(..., description="Timezone-aware publication timestamp.")
@@ -33,7 +33,7 @@ class Post(BaseModel):
 class FeedMeta(BaseModel):
     """Metadata describing a generated feed."""
 
-    id: str = Field(..., description="Stable feed identifier (also the Atom feed id).")
+    id: str = Field(..., description="Stable feed identifier (the key in feeds.yaml).")
     title: str
     site_url: str = Field(..., description="Human-facing blog URL.")
     self_url: str | None = Field(default=None, description="Canonical URL of this feed, if hosted.")

@@ -10,7 +10,7 @@ builder serializes the posts to Atom 1.0.
 
 | Feed id | Blog | Extractor | Source |
 |---------|------|-----------|--------|
-| `boomi` | https://boomi.com/blog/ | `wordpress_api` | WordPress REST API (`wp-json/wp/v2/posts`) |
+| `boomi` | https://boomi.com/blog/ | `wordpress_api` | WordPress REST API (`wp-json/wp/v2/blog`) |
 | `kong`  | https://konghq.com/blog/ | `nextjs_blog` | Embedded `__NEXT_DATA__` JSON |
 | `bump`  | https://bump.sh/blog/ | `bump_blog` | Rendered HTML cards (BeautifulSoup) |
 | `treblle` | https://treblle.com/blog/ | `sanity_blog` | Public Sanity CMS (GROQ query API) |
