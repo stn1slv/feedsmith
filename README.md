@@ -103,7 +103,8 @@ uv run feedsmith generate-all -o ./out      # write <id>.xml for every feed
 | `--help` | all | Show help for the CLI or a specific command. |
 
 A failed run (bad config, unknown feed, fetch/parse error) logs the error and
-exits with status `1`.
+exits with status `1`. `generate-all` skips a feed that fails and carries on
+with the rest; it exits with status `1` only when every feed failed.
 
 ## Adding a blog
 

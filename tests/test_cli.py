@@ -94,3 +94,22 @@ def test_generate_all(
     assert (out_dir / "treblle.xml").exists()
     assert (out_dir / "oreilly.xml").exists()
     assert (out_dir / "books-mulesoft.xml").exists()
+
+
+@respx.mock
+def test_generate_all_exits_nonzero_when_every_feed_fails(tmp_path: Path):
+    cfg = tmp_path / "feeds.yaml"
+    cfg.write_text(
+        "feeds:\n"
+        "  boomi:\n"
+        '    title: "Boomi Blog"\n'
+        "    extractor: wordpress_api\n"
+        '    url: "https://boomi.com/wp-json/wp/v2/blog"\n'
+        '    site_url: "https://boomi.com/blog/"\n',
+        encoding="utf-8",
+    )
+    respx.get("https://boomi.com/wp-json/wp/v2/blog").mock(return_value=httpx.Response(404))
+    out_dir = tmp_path / "out"
+    result = runner.invoke(app, ["generate-all", "-o", str(out_dir), "--config", str(cfg)])
+    assert result.exit_code == 1
+    assert not list(out_dir.glob("*.xml"))
