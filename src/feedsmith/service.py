@@ -9,7 +9,7 @@ from __future__ import annotations
 import httpx
 
 from feedsmith.config import AppConfig, FeedConfig
-from feedsmith.exceptions import FetchError, ParseError
+from feedsmith.exceptions import FeedsmithError, FetchError, ParseError
 from feedsmith.extractors.registry import get_extractor
 from feedsmith.feed import build_atom
 from feedsmith.logging import get_logger
@@ -38,7 +38,9 @@ def generate_all(config: AppConfig, client: httpx.Client) -> dict[str, str]:
     """Generate feeds for every configured blog.
 
     Returns a mapping of feed id to Atom XML. If any feed fails to generate,
-    logs a warning and skips it so other sources still proceed.
+    logs a warning and skips it so other sources still proceed. Raises
+    ``FeedsmithError`` when feeds are configured but every one of them failed,
+    so a scheduled run does not report success without producing anything.
     """
     feeds: dict[str, str] = {}
     for feed_id in config.ids():
@@ -53,6 +55,8 @@ def generate_all(config: AppConfig, client: httpx.Client) -> dict[str, str]:
                 error=str(err),
             )
             continue
+    if config.feeds and not feeds:
+        raise FeedsmithError(f"all {len(config.feeds)} configured feeds failed to generate")
     return feeds
 
 
