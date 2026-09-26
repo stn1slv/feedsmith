@@ -6,9 +6,11 @@ polite, consistent requests.
 
 from __future__ import annotations
 
+from importlib.metadata import version
+
 import httpx
 
-USER_AGENT = "feedsmith/0.1 (+https://github.com/; Atom feed generator)"
+USER_AGENT = f"feedsmith/{version('feedsmith')} (+https://github.com/stn1slv/feedsmith; Atom feed generator)"
 DEFAULT_TIMEOUT = 20.0
 DEFAULT_RETRIES = 2
 
